@@ -5,6 +5,8 @@ from torchvision.datasets import ImageFolder
 from torchvision.transforms import v2
 
 from model import RPSClassifier
+from evaluation import evaluate
+from train import train
 
 BATCH_SIZE = 32
 LEARNING_RATE = 1e-3
@@ -39,4 +41,6 @@ input_size = sample_image.numel()
 
 torch.manual_seed(52)
 model = RPSClassifier(input_size=input_size, num_classes=len(class_names)).to(device)
-print(model)
+
+train(model, LEARNING_RATE, NUM_EPOCHS, train_loader, device)
+evaluate(model, test_loader, device)
