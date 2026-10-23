@@ -5,12 +5,12 @@ from torchvision.datasets import ImageFolder
 from torchvision.transforms import v2
 
 from model import RPSClassifier
-from evaluation import evaluate
+from evaluation import evaluate, confusion_matrix
 from train import train
 
 BATCH_SIZE = 32
 LEARNING_RATE = 1e-3
-NUM_EPOCHS = 10
+NUM_EPOCHS = 15
 
 # Set device device based on whats available
 if torch.cuda.is_available():
@@ -39,8 +39,13 @@ test_loader = DataLoader(test_dataset,batch_size=BATCH_SIZE, shuffle=True)
 sample_image, _ = train_dataset[0]
 input_size = sample_image.numel()
 
-torch.manual_seed(52)
-model = RPSClassifier(input_size=input_size, num_classes=len(class_names)).to(device)
+def train_and_evaluate(num_epochs):
+    torch.manual_seed(52)
+    model = RPSClassifier(input_size=input_size, num_classes=len(class_names)).to(device)
 
-train(model, LEARNING_RATE, NUM_EPOCHS, train_loader, device)
-evaluate(model, test_loader, device)
+    train(model, LEARNING_RATE, num_epochs, train_loader, device)
+    test_predictions = evaluate(model, test_loader, device)
+
+    confusion_matrix(test_predictions, test_loader, class_names)
+
+train_and_evaluate(NUM_EPOCHS)
