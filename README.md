@@ -5,8 +5,9 @@ A TorchVision model trained on images of hands being paper, scissors or rock. Pa
 To run:
 
 ```bash
-git clone 
-git clone
+git clone https://github.com/naomiiiking/paper-scissors-rock-classifier.git
+cd paper-scissors-rock-classifier
+git clone https://github.com/lftraining/LFD2000-resources.git
 
 uv sync
 uv run pipeline.py

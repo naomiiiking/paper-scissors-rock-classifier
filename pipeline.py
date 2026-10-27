@@ -10,7 +10,7 @@ from train import train
 
 BATCH_SIZE = 32
 LEARNING_RATE = 1e-3
-NUM_EPOCHS = 15
+NUM_EPOCHS = 20
 
 # Set device device based on whats available
 if torch.cuda.is_available():
