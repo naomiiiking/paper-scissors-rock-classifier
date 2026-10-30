@@ -10,7 +10,7 @@ from train import train
 
 BATCH_SIZE = 32
 LEARNING_RATE = 1e-3
-NUM_EPOCHS = 20
+NUM_EPOCHS = 30
 
 # Set device device based on whats available
 if torch.cuda.is_available():
@@ -34,18 +34,18 @@ class_names = train_dataset.classes
 
 # Load data with a 12/87 test/training split
 train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
-test_loader = DataLoader(test_dataset,batch_size=BATCH_SIZE, shuffle=True)
+test_loader = DataLoader(test_dataset,batch_size=BATCH_SIZE, shuffle=False)
 
 sample_image, _ = train_dataset[0]
 input_size = sample_image.numel()
 
 def train_and_evaluate(num_epochs):
     torch.manual_seed(52)
-    model = RPSClassifier(input_size=input_size, num_classes=len(class_names)).to(device)
+    model = RPSClassifier(num_classes=len(class_names)).to(device)
 
     train(model, LEARNING_RATE, num_epochs, train_loader, device)
-    test_predictions = evaluate(model, test_loader, device)
+    predictions, labels = evaluate(model, test_loader, device)
 
-    confusion_matrix(test_predictions, test_loader, class_names)
+    confusion_matrix(predictions, labels, class_names)
 
 train_and_evaluate(NUM_EPOCHS)

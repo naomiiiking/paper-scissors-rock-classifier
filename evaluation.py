@@ -2,39 +2,32 @@ import torch
 
 def evaluate(model, test_loader, device):
     """Run testing predictions"""
+    model.eval()
     try:
-        model.eval()
-        correct = 0
-        total = 0
-
+        all_preds, all_labels = [], []
         with torch.inference_mode():
             for images, labels in test_loader:
-                images = images.to(device)
-                labels = labels.to(device)
-
-                logits = model(images)
-                predictions = logits.argmax(dim=1)
-
-                correct += (predictions == labels).sum().item()
-                total += labels.size(0)
-
-        accuracy = correct / total
+                logits = model(images.to(device))
+                all_preds.append(logits.argmax(dim=1).cpu())
+                all_labels.append(labels)
+        predictions = torch.cat(all_preds)
+        labels = torch.cat(all_labels)
+        accuracy = (predictions == labels).float().mean().item()
 
         print(f"Test accuracy: {accuracy:.2%}")
-        return predictions
-    
+        return predictions, labels
+        
     except Exception as e:
         return f"Error in evaluating accurary: {e}"
 
-def confusion_matrix(predictions, test_loader, class_names):
+def confusion_matrix(predictions, labels, class_names):
     """Evaluate confusion matrix, precision and recall from evaluation"""
     try:
         num_classes = len(class_names)
         confusion = torch.zeros(num_classes, num_classes, dtype=torch.int64)
 
-        for _, labels in test_loader:
-            for true_label, predicted_label in zip(labels, predictions):
-                confusion[true_label, predicted_label] += 1
+        for t, p in zip(labels, predictions):
+            confusion[t, p] += 1
 
         print("Confusion matrix:")
         print(confusion)
