@@ -21,18 +21,26 @@ else:
     device = "cpu"
 
 # Image to tensor
-to_tensor = v2.Compose([
+train_tf = v2.Compose([
+      v2.ToImage(), v2.Resize((128, 128)),
+      v2.RandomHorizontalFlip(), v2.RandomRotation(15),
+      v2.ColorJitter(brightness=0.2, contrast=0.2),
+      v2.ToDtype(torch.float32, scale=True),
+  ])
+
+test_tf = v2.Compose([
     v2.ToImage(),
     v2.Resize((128,128)),
     v2.ToDtype(torch.float32, scale=True)
 ])
 
+
+
 # Load datasets and convert to tensors
-train_dataset = ImageFolder("LFD2000-resources/datasets/RPS/train", transform=to_tensor)
-test_dataset = ImageFolder("LFD2000-resources/datasets/RPS/test", transform=to_tensor)
+train_dataset = ImageFolder("LFD2000-resources/datasets/RPS/train", transform=train_tf)
+test_dataset = ImageFolder("LFD2000-resources/datasets/RPS/test", transform=test_tf)
 class_names = train_dataset.classes
 
-# Load data with a 12/87 test/training split
 train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
 test_loader = DataLoader(test_dataset,batch_size=BATCH_SIZE, shuffle=False)
 
